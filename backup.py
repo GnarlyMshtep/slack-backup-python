@@ -127,6 +127,7 @@ def downloadFiles(users):
 
     skipped_files=0
     for file in files:
+        print(file)
         if file['mode'] == 'hidden_by_limit':
             skipped_files+=1
             continue
@@ -153,19 +154,24 @@ def run():
     writeJSONFile(channels, APP_CONSTANTS.CHANNEL_LIST_FILE)
 
     for channel in channels:
+        print(channel)
         channelId = channel['id']
         channelName = channel['name']
-        channelHistory = getConversationHistory(channelId)
-        if channel['is_private']:
-            template = APP_CONSTANTS.PRIVATE_CHANNEL_HISTORY_FILE
-        else:
-            template = APP_CONSTANTS.CHANNEL_HISTORY_FILE
-        channelHistoryFilename = parseTemplatedFileName(template, channelName)
-        writeJSONFile(channelHistory, channelHistoryFilename)
-
-    groups = getGroups()
-    writeJSONFile(groups, APP_CONSTANTS.GROUP_LIST_FILE)
-
+        if channel['is_member']:  # added this if to avoid "not_in_channel" errors
+            channelHistory = getConversationHistory(channelId)
+            if channel['is_private']:
+                template = APP_CONSTANTS.PRIVATE_CHANNEL_HISTORY_FILE
+            else:
+                template = APP_CONSTANTS.CHANNEL_HISTORY_FILE
+            channelHistoryFilename = parseTemplatedFileName(template, channelName)
+            writeJSONFile(channelHistory, channelHistoryFilename)
+      
+            groups = getGroups()
+            writeJSONFile(groups, APP_CONSTANTS.GROUP_LIST_FILE)
+        else: 
+            print(f"skipping channel {channel['name']} -- not a member.")
+    
+    
     for group in groups:
         groupId = group['id']
         groupName = group['name']
