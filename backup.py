@@ -131,22 +131,37 @@ def downloadFiles(users):
         if file['mode'] == 'hidden_by_limit':
             skipped_files+=1
             continue
+        """"
+        {'id': 'F05RECURUUW', 'created': 1694209073, 'timestamp': 1694209073, 'name': 'Authenticated PIR works and directions', 'title': 'Authenticated PIR what exists', 'mimetype': 'application/vnd.google-apps.spreadsheet', 'filetype': 'gsheet', 'pretty_type': 'G Suite Spreadsheet', 'user': 'U0572307DJ4', 'user_team': 'TKC0KS3T9', 'editable': False, 'size': 18377, 'mode': 'external', 'is_external': True, 'external_type': 'gdrive', 'is_public': False, 'public_url_shared': False, 'display_as_bot': False, 'username': '', 'url_private': 'https://docs.google.com/spreadsheets/d/1xoVginoTrbkZluIdLkf0-Vkvo-3KIwqvdj6RhYUn9uU/edit?usp=sharing', 'media_display_type': 'unknown', 'thumb_64': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_64.png', 'thumb_80': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_80.png', 'thumb_360': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_360.png', 'thumb_360_w': 254, 'thumb_360_h': 360, 'thumb_480': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_480.png', 'thumb_480_w': 339, 'thumb_480_h': 480, 'thumb_160': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_160.png', 'thumb_720': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_720.png', 'thumb_720_w': 509, 'thumb_720_h': 720, 'thumb_800': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_800.png', 'thumb_800_w': 800, 'thumb_800_h': 1132, 'thumb_960': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_960.png', 'thumb_960_w': 678, 'thumb_960_h': 960, 'thumb_1024': 'https://files.slack.com/files-tmb/TKC0KS3T9-F05RECURUUW-9109fed65c/authenticated_pir_works_and_directions_1024.png', 'thumb_1024_w': 724, 'thumb_1024_h': 1024, 'original_w': 1024, 'original_h': 1449, 'thumb_tiny': 'AwAwACHTo5oooAOaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q==', 'permalink': 'https://penndsl.slack.com/files/U0572307DJ4/F05RECURUUW/authenticated_pir_works_and_directions', 'channels': ['C0565PAMDN2'], 'groups': [], 'ims': [], 'comments_count': 0}
 
-        url = file['url_private_download']
-        r = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
-        r.raise_for_status()
+        fails to work for google sheets -- just want to retrieve URL instead
+        """
 
         file['date'] = datetime.datetime.fromtimestamp(file['timestamp']).strftime('%Y-%m-%d %H:%M:%S')
         file['author'] = lookupUser(users, file['user'])['name']
-        filename = APP_CONSTANTS.FILES_FILENAME.format(**file)
 
-        print('Downloading to ' + filename)
+        if file['filetype'] == 'gsheet': # we can't download the file in this case, just save URL to text file
+            filename = APP_CONSTANTS.FILES_FILENAME.format(**file) + '.txt' #add .txt because it doesn't seem gfiles have the extension in the field 'name'
+            outputPath = getOutputPath(filename)
+            makedirPath(outputPath)
+            with open(outputPath, 'wb') as f:
+                f.write(str.encode(file['url_private']))
 
-        outputPath = getOutputPath(filename)
-        makedirPath(outputPath)
-        with open(outputPath, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=32*1024):
-                f.write(chunk)
+        else:
+            filename = APP_CONSTANTS.FILES_FILENAME.format(**file)
+            url = file['url_private_download']
+            r = requests.get(url, headers={'Authorization': 'Bearer ' + token}, stream=True)
+            r.raise_for_status()
+
+            print('Downloading to ' + filename)
+
+            outputPath = getOutputPath(filename)
+            makedirPath(outputPath)
+            with open(outputPath, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=32*1024):
+                    f.write(chunk)
+
+
     print(f"{skipped_files} files hidden by limit")
 
 def run():
