@@ -1,0 +1,16 @@
+  988  python3 backup.py --token 'xoxp-8910951619-266447157124-433342496065-687a1ceaea9046688ff28bde02bada5c' --outDir './out'
+  989  python3 backup.py --token 'xoxp-8910951619-266447157124-433342496065-687a1ceaea9046688ff28bde02bada5c' --outDir './out'
+  990  pip3 install requests pip3 install slack-sdk\n\n
+  991  ls
+  992  ls bin
+  993  git config --global pull.rebase true
+  994  git pull
+  995  git pull
+  996  git add -A
+  997  git commit -m "comments on protocol" 
+  998  git psuh 
+  999  git push
+ 1000   brew install --cask slack
+ 1001  python3 -m venv /bin
+ 1002  python3 -m venv 
+ 1003  history
